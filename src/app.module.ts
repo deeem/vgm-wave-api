@@ -1,7 +1,9 @@
-import { Module } from '@nestjs/common';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
+import { Module } from '@nestjs/common'
+import { TypeOrmModule } from '@nestjs/typeorm'
+import { AppController } from './app.controller'
+import { AppService } from './app.service'
+import { CompaniesModule } from './companies/companies.module'
+import { HardwaresModule } from './hardwares/hardwares.module';
 
 @Module({
   imports: [
@@ -15,6 +17,10 @@ import { AppService } from './app.service';
       autoLoadEntities: true,
       synchronize: true,
     }),
+
+    CompaniesModule,
+
+    HardwaresModule,
   ],
   controllers: [AppController],
   providers: [AppService],
