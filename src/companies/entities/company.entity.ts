@@ -1,9 +1,11 @@
 import { Hardware } from 'src/hardwares/entities/hardware.entity'
+import { System } from 'src/systems/entities/system.entity'
 import {
   Column,
   Entity,
   JoinTable,
   ManyToMany,
+  OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm'
 
@@ -20,4 +22,9 @@ export class Company {
   })
   @JoinTable()
   hardwares: Hardware[]
+
+  @OneToMany(() => System, (system) => system.company, {
+    cascade: true,
+  })
+  systems: System[]
 }
