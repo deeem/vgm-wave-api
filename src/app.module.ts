@@ -5,6 +5,7 @@ import { AppService } from './app.service'
 import { CompaniesModule } from './companies/companies.module'
 import { HardwaresModule } from './hardwares/hardwares.module';
 import { SystemsModule } from './systems/systems.module';
+import { GamesModule } from './games/games.module';
 
 @Module({
   imports: [
@@ -24,6 +25,8 @@ import { SystemsModule } from './systems/systems.module';
     HardwaresModule,
 
     SystemsModule,
+
+    GamesModule,
   ],
   controllers: [AppController],
   providers: [AppService],
