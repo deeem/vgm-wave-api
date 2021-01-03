@@ -2,10 +2,8 @@ import { Module } from '@nestjs/common'
 import { TypeOrmModule } from '@nestjs/typeorm'
 import { AppController } from './app.controller'
 import { AppService } from './app.service'
-import { CompaniesModule } from './companies/companies.module'
-import { HardwaresModule } from './hardwares/hardwares.module';
-import { SystemsModule } from './systems/systems.module';
-import { GamesModule } from './games/games.module';
+import { SystemsModule } from './systems/systems.module'
+import { GamesModule } from './games/games.module'
 
 @Module({
   imports: [
@@ -19,10 +17,6 @@ import { GamesModule } from './games/games.module';
       autoLoadEntities: true,
       synchronize: true,
     }),
-
-    CompaniesModule,
-
-    HardwaresModule,
 
     SystemsModule,
 

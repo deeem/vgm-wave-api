@@ -1,7 +1,7 @@
-import { Controller, Get, Post, Body, Put, Param, Delete } from '@nestjs/common';
-import { SystemsService } from './systems.service';
-import { CreateSystemDto } from './dto/create-system.dto';
-import { UpdateSystemDto } from './dto/update-system.dto';
+import { Controller, Get, Post, Body, Put, Param, Delete } from '@nestjs/common'
+import { SystemsService } from './systems.service'
+import { CreateSystemDto } from './dto/create-system.dto'
+import { UpdateSystemDto } from './dto/update-system.dto'
 
 @Controller('systems')
 export class SystemsController {
@@ -9,26 +9,26 @@ export class SystemsController {
 
   @Post()
   create(@Body() createSystemDto: CreateSystemDto) {
-    return this.systemsService.create(createSystemDto);
+    return this.systemsService.create(createSystemDto)
   }
 
   @Get()
   findAll() {
-    return this.systemsService.findAll();
+    return this.systemsService.findAll()
   }
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.systemsService.findOne(+id);
+    return this.systemsService.findOne(+id)
   }
 
   @Put(':id')
   update(@Param('id') id: string, @Body() updateSystemDto: UpdateSystemDto) {
-    return this.systemsService.update(+id, updateSystemDto);
+    return this.systemsService.update(+id, updateSystemDto)
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.systemsService.remove(+id);
+    return this.systemsService.remove(+id)
   }
 }
