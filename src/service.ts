@@ -1,3 +1,4 @@
+import { readFileSync } from 'fs'
 import { Injectable } from '@nestjs/common'
 import { ConsoleService } from 'nestjs-console'
 import { GamesService } from './games/games.service'
@@ -21,6 +22,22 @@ export class MyConsoleService {
   }
 
   importVgmRips = async (): Promise<void> => {
+    //  TODO
+    // [*] read json
+    // for each entry
+    // [] create system
+    // [] create game
     //
+    // [] unpack zip
+    // [] create playlist with tracks
+
+    let vgmImport = {}
+
+    try {
+      vgmImport = JSON.parse(readFileSync('./vgmrips/games.json', 'utf8'))
+    } catch (e) {
+      console.error(e)
+    }
+    console.log(vgmImport)
   }
 }
