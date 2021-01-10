@@ -2,10 +2,14 @@ import { Module } from '@nestjs/common'
 import { TypeOrmModule } from '@nestjs/typeorm'
 import { AppController } from './app.controller'
 import { AppService } from './app.service'
+import { ConsoleModule } from 'nestjs-console'
+
 import { SystemsModule } from './systems/systems.module'
 import { GamesModule } from './games/games.module'
 import { PlaylistsModule } from './playlists/playlists.module'
 import { TracksModule } from './tracks/tracks.module'
+import { MyService } from 'src/service'
+import { MyNewService } from './service.new'
 
 @Module({
   imports: [
@@ -20,6 +24,8 @@ import { TracksModule } from './tracks/tracks.module'
       synchronize: true,
     }),
 
+    ConsoleModule,
+
     SystemsModule,
 
     GamesModule,
@@ -29,6 +35,7 @@ import { TracksModule } from './tracks/tracks.module'
     TracksModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, MyService, MyNewService],
+  exports: [MyService, MyNewService],
 })
 export class AppModule {}
