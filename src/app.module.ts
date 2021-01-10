@@ -8,8 +8,7 @@ import { SystemsModule } from './systems/systems.module'
 import { GamesModule } from './games/games.module'
 import { PlaylistsModule } from './playlists/playlists.module'
 import { TracksModule } from './tracks/tracks.module'
-import { MyService } from 'src/service'
-import { MyNewService } from './service.new'
+import { MyConsoleService } from 'src/service'
 
 @Module({
   imports: [
@@ -35,7 +34,7 @@ import { MyNewService } from './service.new'
     TracksModule,
   ],
   controllers: [AppController],
-  providers: [AppService, MyService, MyNewService],
-  exports: [MyService, MyNewService],
+  providers: [AppService, MyConsoleService],
+  exports: [MyConsoleService],
 })
 export class AppModule {}
