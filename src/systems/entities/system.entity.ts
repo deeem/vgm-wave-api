@@ -9,6 +9,6 @@ export class System {
   @Column()
   name: string
 
-  @OneToMany(() => Game, (game) => game.system)
+  @OneToMany(() => Game, (game) => game.system, { cascade: true })
   games: Game[]
 }
