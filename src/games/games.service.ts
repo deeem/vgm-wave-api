@@ -9,9 +9,9 @@ import { Game } from './entities/game.entity'
 @Injectable()
 export class GamesService {
   constructor(
-    @InjectRepository(Game) private readonly gameRepository: Repository<Game>,
+    @InjectRepository(Game) readonly gameRepository: Repository<Game>,
     @InjectRepository(System)
-    private readonly systemRepository: Repository<System>,
+    readonly systemRepository: Repository<System>,
   ) {}
 
   async create(createGameDto: CreateGameDto) {

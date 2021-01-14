@@ -25,6 +25,10 @@ export class MyConsoleService {
   }
 
   importVgmRips = async (): Promise<void> => {
+    console.log(this.gamesService.gameRepository)
+
+    return
+
     //  TODO
     // [*] read json
     // for each entry
