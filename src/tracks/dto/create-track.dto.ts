@@ -5,5 +5,11 @@ export class CreateTrackDto {
   readonly name: string
 
   @IsString()
+  readonly games: number[]
+
+  @IsString()
+  readonly playlists?: number[]
+
+  @IsString()
   readonly type?: string
 }
