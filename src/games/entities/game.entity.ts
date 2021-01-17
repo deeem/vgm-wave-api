@@ -24,8 +24,8 @@ export class Game {
   system: System
 
   @ManyToMany(() => Playlist, (playlist) => playlist.games)
-  playlists: Playlist[]
+  playlists?: Playlist[]
 
   @ManyToMany(() => Track, (track) => track.games)
-  tracks: Track[]
+  tracks?: Track[]
 }

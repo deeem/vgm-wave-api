@@ -20,7 +20,7 @@ export class Track {
   type: string
 
   @Column()
-  path: string
+  file: string
 
   @ManyToMany(() => Playlist, (playlist) => playlist.tracks)
   playlists: Playlist[]

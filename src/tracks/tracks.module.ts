@@ -10,5 +10,6 @@ import { Game } from 'src/games/entities/game.entity'
   imports: [TypeOrmModule.forFeature([Track, Playlist, Game])],
   controllers: [TracksController],
   providers: [TracksService],
+  exports: [TracksService],
 })
 export class TracksModule {}
