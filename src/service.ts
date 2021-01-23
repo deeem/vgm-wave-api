@@ -8,6 +8,25 @@ import { GamesService } from './games/games.service'
 import { System } from './systems/entities/system.entity'
 import { TracksService } from './tracks/tracks.service'
 
+function* vgmExportParser(path) {
+  let vgmJson = {}
+  try {
+    vgmJson = JSON.parse(readFileSync(path, 'utf8'))
+  } catch (e) {
+    throw e
+  }
+
+  const systemNames = Object.keys(vgmJson)
+
+  for (const systemName of systemNames) {
+    const gamesList = Object.entries(vgmJson[systemName])
+
+    for (const [gameName, fileName] of gamesList) {
+      yield { system: systemName, game: gameName, file: fileName }
+    }
+  }
+}
+
 @Injectable()
 export class MyConsoleService {
   constructor(
@@ -38,6 +57,14 @@ export class MyConsoleService {
   }
 
   importVgmRips = async (): Promise<void> => {
+    const games = vgmExportParser('./vgmrips/games.json')
+
+    console.log(games.next())
+    console.log(games.next())
+    console.log(games.next())
+
+    return
+
     let vgmImport = {}
 
     try {
