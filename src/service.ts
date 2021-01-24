@@ -30,6 +30,22 @@ function* vgmExportParser(path: string) {
   }
 }
 
+function getTrackData(fileName: string) {
+  const trackName = fileName.match(/^[\d]{2,3}\s([\w\s\(\),_-]*).vgz$/)?.[1]
+  const trackNumber = fileName.match(/^([\d]{2,3})\s[\w\s\(\),_-]*.vgz$/)?.[1]
+  const trackUploadedFileName = `${uuidv4()}.vgz`
+
+  if (!trackName || !trackNumber) {
+    throw `file name: "${fileName}" can not be parsed`
+  }
+
+  return {
+    name: trackName,
+    number: trackNumber,
+    uploadName: trackUploadedFileName,
+  }
+}
+
 @Injectable()
 export class MyConsoleService {
   constructor(
@@ -78,8 +94,6 @@ export class MyConsoleService {
     const games = vgmExportParser('./vgmrips/games.json')
 
     for (const gameInfo of games) {
-      // console.log(gameInfo)
-
       const system = await this.preloadSystemByName(gameInfo.systemName)
 
       const gameEntity = this.gamesService.gameRepository.create({
@@ -97,26 +111,15 @@ export class MyConsoleService {
         const fileName = entry.path
 
         if (path.extname(fileName) === '.vgz') {
-          const trackName = fileName.match(
-            /^[\d]{2,3}\s([\w\s\(\),_-]*).vgz$/,
-          )?.[1]
-          const trackNumber = fileName.match(
-            /^([\d]{2,3})\s[\w\s\(\),_-]*.vgz$/,
-          )?.[1]
-          const trackUploadedFileName = `${uuidv4()}.vgz`
-          if (!trackName || !trackNumber) {
-            throw `file name: "${fileName}" can not be parsed; game: ${game.name}`
-          }
+          const trackData = getTrackData(fileName)
 
-          this.createTrack(trackName, trackUploadedFileName, [game])
+          this.createTrack(trackData.name, trackData.uploadName, [game])
             .then((track) => {
               console.log(track.name)
               tracks.push(track)
             })
             .then(() => {
-              entry.pipe(
-                createWriteStream(`./uploads/${trackUploadedFileName}`),
-              )
+              entry.pipe(createWriteStream(`./uploads/${trackData.uploadName}`))
             })
         } else {
           entry.autodrain()
