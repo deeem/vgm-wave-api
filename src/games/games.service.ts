@@ -23,7 +23,7 @@ export class GamesService {
   }
 
   findAll() {
-    return this.gameRepository.find()
+    return this.gameRepository.find({ relations: ['system', 'playlists'] })
   }
 
   async findOne(id: number) {
