@@ -100,8 +100,9 @@ export class MyConsoleService {
       )
       for await (const entry of zip) {
         const fileName = entry.path
+        const fileType = path.extname(fileName)
 
-        if (path.extname(fileName) === '.vgz') {
+        if (fileType === '.vgz') {
           const trackData = getTrackData(fileName)
 
           this.createTrack(trackData.name, trackData.uploadName, [game])
@@ -111,6 +112,15 @@ export class MyConsoleService {
             .then(() => {
               entry.pipe(createWriteStream(`./uploads/${trackData.uploadName}`))
             })
+        }
+        if (fileType === '.png') {
+          const imageName = `${uuidv4()}.png`
+          const images = game.images ? [...game.images] : []
+          game.images = [...images, imageName]
+
+          this.gamesService.gameRepository.save(game).then(() => {
+            entry.pipe(createWriteStream(`./uploads/${imageName}`))
+          })
         } else {
           entry.autodrain()
         }
@@ -122,15 +132,7 @@ export class MyConsoleService {
         tracks: tracks,
       })
 
-      const playlist = await this.trackService.playlistRepository.save(
-        playlistEntity,
-      )
-
-      console.log('playlist', playlist.name)
-
-      // break
+      await this.trackService.playlistRepository.save(playlistEntity)
     }
-
-    // return
   }
 }
