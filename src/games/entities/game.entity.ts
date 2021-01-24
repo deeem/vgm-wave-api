@@ -18,9 +18,9 @@ export class Game {
   name: string
 
   @Column('simple-array', { nullable: true })
-  images: string[]
+  images?: string[]
 
-  @ManyToOne(() => System, (system) => system.games)
+  @ManyToOne(() => System, (system) => system.games, { cascade: true })
   system: System
 
   @ManyToMany(() => Playlist, (playlist) => playlist.games)

@@ -7,8 +7,11 @@ import { ConsoleService } from 'nestjs-console'
 import { GamesService } from './games/games.service'
 import { System } from './systems/entities/system.entity'
 import { TracksService } from './tracks/tracks.service'
+import { Track } from './tracks/entities/track.entity'
+import { Game } from './games/entities/game.entity'
+import { Playlist } from './playlists/entities/playlist.entity'
 
-function* vgmExportParser(path) {
+function* vgmExportParser(path: string) {
   let vgmJson = {}
   try {
     vgmJson = JSON.parse(readFileSync(path, 'utf8'))
@@ -22,7 +25,7 @@ function* vgmExportParser(path) {
     const gamesList = Object.entries(vgmJson[systemName])
 
     for (const [gameName, fileName] of gamesList) {
-      yield { system: systemName, game: gameName, file: fileName }
+      yield { systemName, gameName, fileName }
     }
   }
 }
@@ -56,85 +59,85 @@ export class MyConsoleService {
     return this.gamesService.systemRepository.create({ name })
   }
 
+  private async createTrack(
+    name: string,
+    file: string,
+    games: Game[],
+  ): Promise<Track> {
+    const trackEntity = this.trackService.trackRepository.create({
+      name,
+      file,
+      games,
+    })
+    const track = await this.trackService.trackRepository.save(trackEntity)
+
+    return track
+  }
+
   importVgmRips = async (): Promise<void> => {
     const games = vgmExportParser('./vgmrips/games.json')
 
-    console.log(games.next())
-    console.log(games.next())
-    console.log(games.next())
+    for (const gameInfo of games) {
+      // console.log(gameInfo)
+
+      const system = await this.preloadSystemByName(gameInfo.systemName)
+
+      const gameEntity = this.gamesService.gameRepository.create({
+        name: gameInfo.gameName,
+        system,
+      })
+      const game = await this.gamesService.gameRepository.save(gameEntity)
+
+      const tracks = []
+
+      const zip = createReadStream(`./vgmrips/${gameInfo.fileName}`).pipe(
+        unzipper.Parse({ forceStream: true }),
+      )
+      for await (const entry of zip) {
+        const fileName = entry.path
+
+        if (path.extname(fileName) === '.vgz') {
+          const trackName = fileName.match(
+            /^[\d]{2,3}\s([\w\s\(\),_-]*).vgz$/,
+          )?.[1]
+          const trackNumber = fileName.match(
+            /^([\d]{2,3})\s[\w\s\(\),_-]*.vgz$/,
+          )?.[1]
+          const trackUploadedFileName = `${uuidv4()}.vgz`
+          if (!trackName || !trackNumber) {
+            throw `file name: "${fileName}" can not be parsed; game: ${game.name}`
+          }
+
+          this.createTrack(trackName, trackUploadedFileName, [game])
+            .then((track) => {
+              console.log(track.name)
+              tracks.push(track)
+            })
+            .then(() => {
+              entry.pipe(
+                createWriteStream(`./uploads/${trackUploadedFileName}`),
+              )
+            })
+        } else {
+          entry.autodrain()
+        }
+      }
+
+      const playlistEntity = this.trackService.playlistRepository.create({
+        name: `${game.name} OST`,
+        games: [game],
+        tracks: tracks,
+      })
+
+      const playlist = await this.trackService.playlistRepository.save(
+        playlistEntity,
+      )
+
+      console.log('playlist', playlist)
+
+      break
+    }
 
     return
-
-    let vgmImport = {}
-
-    try {
-      vgmImport = JSON.parse(readFileSync('./vgmrips/games.json', 'utf8'))
-    } catch (e) {
-      console.error(e)
-    }
-
-    // START
-
-    // console.log(';;', vgmImport['M58']['10-Yard Fight'])
-
-    const systemName = 'M58'
-    const gameName = '10-Yard Fight'
-    const testFileName = vgmImport[systemName][gameName]
-
-    const system = await this.preloadSystemByName(systemName)
-    const gameA = this.gamesService.gameRepository.create({
-      name: gameName,
-      system,
-    })
-    const game = await this.gamesService.gameRepository.save(gameA)
-
-    const zip = createReadStream(`./vgmrips/${testFileName}`).pipe(
-      unzipper.Parse({ forceStream: true }),
-    )
-    for await (const entry of zip) {
-      const fileName = entry.path
-
-      console.log(fileName)
-
-      if (path.extname(fileName) === '.vgz') {
-        const trackName = fileName.match(/^[\d]{2,3}\s([\w\s]*).vgz/)?.[1]
-        const trackNumber = fileName.match(/^([\d]{2,3})\s[\w\s]*.vgz/)?.[1]
-        const trackUploadedFileName = `${uuidv4()}.vgz`
-
-        console.log({ trackName, trackNumber, trackUploadedFileName })
-
-        const track = await this.trackService.trackRepository.create({
-          name: trackName,
-          file: trackUploadedFileName,
-          games: [game],
-        })
-        await this.trackService.trackRepository.save(track)
-
-        // this.trackService.trackRepository.save(
-        //   this.trackService.trackRepository.create({
-        //     name: trackName,
-        //     file: trackUploadedFileName,
-        //     games: [game],
-        //   }),
-        // )
-
-        await entry.pipe(
-          createWriteStream(`./uploads/${trackUploadedFileName}`),
-        )
-      } else {
-        entry.autodrain()
-      }
-    }
-
-    // END
-    return
-
-    for (const systemName in vgmImport) {
-      for (const gameName in vgmImport[systemName]) {
-        // console.log('->', gameName, fileName)
-        const fileName = vgmImport[systemName][gameName]
-        // await this.gamesService.create({ name: gameName, system: systemName })
-      }
-    }
   }
 }
