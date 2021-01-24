@@ -9,7 +9,6 @@ import { System } from './systems/entities/system.entity'
 import { TracksService } from './tracks/tracks.service'
 import { Track } from './tracks/entities/track.entity'
 import { Game } from './games/entities/game.entity'
-import { Playlist } from './playlists/entities/playlist.entity'
 
 function* vgmExportParser(path: string) {
   let vgmJson = {}
@@ -31,18 +30,10 @@ function* vgmExportParser(path: string) {
 }
 
 function getTrackData(fileName: string) {
-  const trackName = fileName.match(/^[\d]{2,3}\s([\w\s\(\),_-]*).vgz$/)?.[1]
-  const trackNumber = fileName.match(/^([\d]{2,3})\s[\w\s\(\),_-]*.vgz$/)?.[1]
-  const trackUploadedFileName = `${uuidv4()}.vgz`
-
-  if (!trackName || !trackNumber) {
-    throw `file name: "${fileName}" can not be parsed`
-  }
-
   return {
-    name: trackName,
-    number: trackNumber,
-    uploadName: trackUploadedFileName,
+    name: fileName.substring(3, fileName.length - 4),
+    number: fileName.substring(0, 2),
+    uploadName: `${uuidv4()}.vgz`,
   }
 }
 
@@ -115,7 +106,6 @@ export class MyConsoleService {
 
           this.createTrack(trackData.name, trackData.uploadName, [game])
             .then((track) => {
-              console.log(track.name)
               tracks.push(track)
             })
             .then(() => {
@@ -136,11 +126,11 @@ export class MyConsoleService {
         playlistEntity,
       )
 
-      console.log('playlist', playlist)
+      console.log('playlist', playlist.name)
 
-      break
+      // break
     }
 
-    return
+    // return
   }
 }
